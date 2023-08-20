@@ -22,15 +22,25 @@ class ApiRequests{
 	}
 	
 	public function get($endpoint,$parametros){	
-		$parametros=http_build_query($parametros);
-		$url_feed=$this->baseUrl.$endpoint."?".$parametros; 
+		if(count($parametros)>0)
+		{
+			$parametros=http_build_query($parametros);
+			
+			$url_feed=$this->baseUrl.$endpoint."?".$parametros; 
+		}
+		else
+			$url_feed=$this->baseUrl.$endpoint;
+
 		$ch=curl_init();
 		curl_setopt($ch, CURLOPT_URL,$url_feed);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER,true);
 		curl_setopt($ch , CURLOPT_HTTPHEADER, $this->getHeader());
 		$result=json_decode(curl_exec($ch),true) ;
 		curl_close($ch);
-		Helpers::isJson($result)==0 ? $result = json_decode($result) :null;
+
+		if(!is_array($result))
+			Helpers::isJson($result)==0 ? $result = json_decode($result) :null;			
+		
 		return $result;
 	}
 	
